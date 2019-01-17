@@ -16,14 +16,20 @@
 package io.qameta.allure.tags;
 
 import io.qameta.allure.Aggregator;
+import io.qameta.allure.context.JacksonContext;
 import io.qameta.allure.core.Configuration;
 import io.qameta.allure.core.LaunchResults;
 import io.qameta.allure.entity.LabelName;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,17 +38,29 @@ import java.util.Set;
 public class TagsPlugin implements Aggregator {
 
     public static final String TAGS_BLOCK_NAME = "tags";
+    public static final String TAGS_FILE_NAME = "tags.json";
+    private final Set<String> allTags = new HashSet<>();
 
     @Override
     public void aggregate(final Configuration configuration,
                           final List<LaunchResults> launchesResults,
-                          final Path outputDirectory) {
+                          final Path outputDirectory) throws IOException {
         launchesResults.stream()
                 .map(LaunchResults::getAllResults)
                 .flatMap(Collection::stream)
                 .forEach(result -> {
                     final Set<String> tags = new HashSet<>(result.findAllLabels(LabelName.TAG));
+                    allTags.addAll(tags);
                     result.addExtraBlock(TAGS_BLOCK_NAME, tags);
                 });
+
+        final JacksonContext context = configuration.requireContext(JacksonContext.class);
+        final Path historyFolder = Files.createDirectories(outputDirectory.resolve(TAGS_BLOCK_NAME));
+        final Path historyFile = historyFolder.resolve(TAGS_FILE_NAME);
+        Map<String, Set> tags = new HashMap<>();
+        tags.put(TAGS_BLOCK_NAME, allTags);
+        try (OutputStream os = Files.newOutputStream(historyFile)) {
+            context.getValue().writeValue(os, tags);
+        }
     }
 }
