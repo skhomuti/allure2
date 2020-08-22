@@ -35,9 +35,9 @@ public class TagsPluginTest {
     public void fileShouldHasAllTags() throws IOException {
 
         final Path tempPath = folder.newFolder().toPath();
-        final TestResult fitstTestResult = new TestResult().setName("fitstTestResult");
+        final TestResult firstTestResult = new TestResult().setName("firstTestResult");
         final TestResult secondTestResult = new TestResult().setName("secondTestResult");
-        final Set<TestResult> testResults = new HashSet<>(Arrays.asList(fitstTestResult, secondTestResult));
+        final Set<TestResult> testResults = new HashSet<>(Arrays.asList(firstTestResult, secondTestResult));
         final LaunchResults launchResults = new DefaultLaunchResults(
                 testResults,
                 Collections.emptyMap(),
@@ -45,12 +45,12 @@ public class TagsPluginTest {
         );
         final List<LaunchResults> launchResultsList = new ArrayList<>();
         launchResultsList.add(launchResults);
-        fitstTestResult.addLabel(LabelName.TAG.value(), "tag1");
-        fitstTestResult.addLabel(LabelName.TAG.value(), "tag2");
+        firstTestResult.addLabel(LabelName.TAG.value(), "tag1");
+        firstTestResult.addLabel(LabelName.TAG.value(), "tag2");
         secondTestResult.addLabel(LabelName.TAG.value(), "tag3");
 
         tagsPlugin.aggregate(configuration, launchResultsList, tempPath);
-        try (InputStream is = Files.newInputStream(tempPath.resolve("tags/tags.json"))) {
+        try (InputStream is = Files.newInputStream(tempPath.resolve("data/tags.json"))) {
             final ObjectMapper mapper = new ObjectMapper();
             assertThat(mapper.readTree(is))
                     .isEqualTo(mapper.readTree("{\"tags\": [\"tag1\",\"tag2\",\"tag3\"]}"));

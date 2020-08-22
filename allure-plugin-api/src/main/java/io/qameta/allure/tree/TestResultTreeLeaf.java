@@ -19,6 +19,7 @@ import io.qameta.allure.entity.Status;
 import io.qameta.allure.entity.TestResult;
 import io.qameta.allure.entity.Time;
 
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -40,6 +41,8 @@ public class TestResultTreeLeaf extends DefaultTreeLeaf {
 
     private final List<String> parameters;
 
+    private final HashSet<String> tags;
+
     public TestResultTreeLeaf(final String parentUid, final TestResult testResult) {
         this(
                 parentUid,
@@ -57,6 +60,7 @@ public class TestResultTreeLeaf extends DefaultTreeLeaf {
         this.flaky = testResult.isFlaky();
         this.newFailed = testResult.isNewFailed();
         this.parameters = testResult.getParameterValues();
+        this.tags = testResult.getExtraBlock("tags");
 
     }
     public String getParentUid() {
@@ -86,4 +90,6 @@ public class TestResultTreeLeaf extends DefaultTreeLeaf {
     public List<String> getParameters() {
         return parameters;
     }
+
+    public HashSet<String> getTags() { return tags; }
 }

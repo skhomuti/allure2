@@ -1,0 +1,10 @@
+@import "../../variables.scss";
+
+.tags {
+  &__container {
+    width: 100%;
+    max-width: 350px;
+    float: right;
+    display: block;
+  }
+}

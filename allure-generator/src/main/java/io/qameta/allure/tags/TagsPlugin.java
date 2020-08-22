@@ -16,6 +16,7 @@
 package io.qameta.allure.tags;
 
 import io.qameta.allure.Aggregator;
+import io.qameta.allure.Constants;
 import io.qameta.allure.context.JacksonContext;
 import io.qameta.allure.core.Configuration;
 import io.qameta.allure.core.LaunchResults;
@@ -55,11 +56,11 @@ public class TagsPlugin implements Aggregator {
                 });
 
         final JacksonContext context = configuration.requireContext(JacksonContext.class);
-        final Path historyFolder = Files.createDirectories(outputDirectory.resolve(TAGS_BLOCK_NAME));
-        final Path historyFile = historyFolder.resolve(TAGS_FILE_NAME);
-        Map<String, Set> tags = new HashMap<>();
+        final Path dataFolder = Files.createDirectories(outputDirectory.resolve(Constants.DATA_DIR));
+        final Path tagsFile = dataFolder.resolve(TAGS_FILE_NAME);
+        final Map<String, Set> tags = new HashMap<>();
         tags.put(TAGS_BLOCK_NAME, allTags);
-        try (OutputStream os = Files.newOutputStream(historyFile)) {
+        try (OutputStream os = Files.newOutputStream(tagsFile)) {
             context.getValue().writeValue(os, tags);
         }
     }

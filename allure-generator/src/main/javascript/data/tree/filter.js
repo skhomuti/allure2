@@ -26,6 +26,14 @@ function byText(text) {
     };
 }
 
+function byTags(tags) {
+    return (child) => {
+        return !tags
+            || (child.tags && tags.every(tag => child.tags.includes(tag)))
+            || child.children && child.children.some(byTags(tags));
+    };
+}
+
 function byMark(marks) {
     return (child) => {
         if (child.children) {
@@ -47,4 +55,4 @@ function mix(...filters) {
 }
 
 
-export {byStatuses, byDuration, byText, byMark, mix};
+export {byStatuses, byDuration, byText, byTags, byMark, mix};

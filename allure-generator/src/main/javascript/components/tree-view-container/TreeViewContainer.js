@@ -6,6 +6,7 @@ import NodeSorterView from '../node-sorter/NodeSorterView';
 import NodeSearchView from '../node-search/NodeSearchView';
 import StatusToggleView from '../status-toggle/StatusToggleView';
 import MarksToggleView from '../marks-toggle/MarksToggleView';
+import TagsFilterView from '../tags-filter/TagsFilterView';
 import TreeView from '../tree/TreeView';
 import {Model} from 'backbone';
 import {getSettingsForTreePlugin} from '../../utils/settingsFactory';
@@ -17,6 +18,7 @@ import {getSettingsForTreePlugin} from '../../utils/settingsFactory';
     sorter: '.tree__sorter',
     filter: '.tree__filter',
     filterMarks: '.tree__filter-marks',
+    filterTags: '.tree__filter-tags',
     content: '.tree__content'
 })
 class TreeViewContainer extends View {
@@ -61,6 +63,9 @@ class TreeViewContainer extends View {
         }));
         this.showChildView('filterMarks', new MarksToggleView({
             settings: this.settings
+        }));
+        this.showChildView('filterTags', new TagsFilterView({
+            state: this.state
         }));
     }
 

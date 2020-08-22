@@ -1,19 +1,22 @@
 import './styles.scss';
 import {View} from 'backbone.marionette';
 import hotkeys from '../../utils/hotkeys';
+import difference from 'underscore';
 import template from './TreeView.hbs';
 import {behavior, className, on} from '../../decorators';
 import router from '../../router';
 import getComparator from '../../data/tree/comparator';
-import {byStatuses, byText, byMark, mix} from '../../data/tree/filter';
+import {byStatuses, byText, byTags, byMark, mix} from '../../data/tree/filter';
 import {SEARCH_QUERY_KEY} from '../node-search/NodeSearchView';
+import {TAGS_QUERY_KEY} from '../tags-filter/TagsFilterView';
 
 @className('tree')
 @behavior('TooltipBehavior', {position: 'bottom'})
 class TreeView extends View {
     template = template;
 
-    cachedQuery = '';
+    cachedSearchQuery = '';
+    cachedTagsQuery = '';
     initialize({routeState, state, tabName, baseUrl, settings}) {
         this.state = state;
         this.routeState = routeState;
@@ -37,7 +40,8 @@ class TreeView extends View {
         const visibleStatuses = this.settings.getVisibleStatuses();
         const visibleMarks = this.settings.getVisibleMarks();
         const searchQuery = this.state.get(SEARCH_QUERY_KEY);
-        const filter = mix(byText(searchQuery), byStatuses(visibleStatuses), byMark(visibleMarks));
+        const tagsQuery = this.state.get(TAGS_QUERY_KEY);
+        const filter = mix(byText(searchQuery), byTags(tagsQuery), byStatuses(visibleStatuses), byMark(visibleMarks));
 
         const sortSettings = this.settings.getTreeSorting();
         const sorter = getComparator(sortSettings);
@@ -62,10 +66,12 @@ class TreeView extends View {
     }
 
     handleStateChange() {
-        const query = this.state.get(SEARCH_QUERY_KEY);
+        const searchQuery = this.state.get(SEARCH_QUERY_KEY);
+        const tagsQuery = this.state.get(TAGS_QUERY_KEY) || '';
         // need to check this ot to re-render nodes on folding
-        if (query !== this.cachedQuery) {
-            this.cachedQuery = query;
+        if (searchQuery !== this.cachedSearchQuery || tagsQuery == this.cachedTagsQuery) {
+            this.cachedSearchQuery = searchQuery;
+            this.cachedTagsQuery = tagsQuery;
             this.render();
         }
     }
@@ -190,6 +196,7 @@ class TreeView extends View {
             statistic: this.collection.statistic,
             uid: this.collection.uid,
             tabName: this.tabName,
+            tags: this.collection,
             items: this.collection.toJSON(),
             testResultTab: this.routeState.get('testResultTab') || ''
         };
